@@ -7,8 +7,10 @@ future model instrumentation can opt into explicitly.
 
 from __future__ import annotations
 
+import threading
+from contextlib import contextmanager
 from dataclasses import dataclass, field
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Iterator, Optional
 
 import torch
 
@@ -44,6 +46,32 @@ class TelemetryState:
             "hidden_norms": dict(self.hidden_norms),
             "spectral_radius": self.spectral_radius,
         }
+
+
+_telemetry_ctx = threading.local()
+
+
+@contextmanager
+def observe_telemetry(state: TelemetryState) -> Iterator[TelemetryState]:
+    """Activate telemetry collection within the current thread.
+
+    The previous context is restored on exit so nested observations are safe.
+    This context only exposes a container to instrumented modules; it does not
+    alter model computation, gradients, loss, routing, or control flow.
+    """
+
+    previous = getattr(_telemetry_ctx, "current", None)
+    _telemetry_ctx.current = state
+    try:
+        yield state
+    finally:
+        _telemetry_ctx.current = previous
+
+
+def get_current_telemetry() -> Optional[TelemetryState]:
+    """Return the active telemetry state for this thread, if one exists."""
+
+    return getattr(_telemetry_ctx, "current", None)
 
 
 def compute_expert_telemetry(expert_counts: torch.Tensor) -> Dict[str, float | int]:
