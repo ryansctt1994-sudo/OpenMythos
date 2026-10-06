@@ -1,5 +1,8 @@
 # OpenMythos
 
+> [!IMPORTANT]
+> **Research-status boundary — 2026-10-06:** OpenMythos is an experimental/theoretical implementation. A configuration preset (including 100B/500B/1T presets) is **not** evidence that weights were trained, that the preset is practical on available hardware, that the advertised context/output scale was validated, or that it reproduces any proprietary Anthropic system. Local code execution, when present, remains bounded implementation evidence only. See [EVIDENCE_STATUS.md](EVIDENCE_STATUS.md).
+
 <p align="left">
   <a href="https://pypi.org/project/open-mythos/" target="_blank">
     <picture>
@@ -107,7 +110,7 @@ print(
 
 ## Model Variants
 
-Pre-configured scales from 1B to 1T parameters:
+Architecture/configuration presets from 1B to 1T parameters (presets are not trained checkpoints or validated scale claims):
 
 ```python
 from open_mythos import (
